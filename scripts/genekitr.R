@@ -27,6 +27,5 @@ tab <- GSE130688 %>%
   select(Gene_ID, Gene_Symbol, Gene_Description, Gene_Biotype, everything()) |> 
   filter(Gene_Biotype == "protein_coding")
 
-
 # Export the annotated results
 export(tab, "outputs/DESeq2/Annotated/GSE130688.csv")

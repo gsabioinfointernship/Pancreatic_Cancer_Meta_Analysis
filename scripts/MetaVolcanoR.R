@@ -44,7 +44,6 @@ meta_results <- meta_degs_rem@metaresult
 export(meta_results, "outputs/MetaVolcanoR/REM.csv")
 
 # Filter results 
-# Filter results 
 sign_degs <- meta_results |> 
   filter(randomP < 0.05, 
          abs(randomSummary) >= 1,
