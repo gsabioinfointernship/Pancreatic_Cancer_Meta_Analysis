@@ -37,7 +37,7 @@ dds <- DESeqDataSetFromMatrix(countData = count_data,
 # 07. filter any counts less than 10
 keep <- rowSums(counts(dds) > round(nrow(metadata)/2)) >= 10
 dds <- dds[keep,]
-# ------------------------------------------------------------------------------
+
 # 06. Estimate number of surrogate variables
 mod    <- model.matrix(~ condition, data = colData(dds))
 mod0   <- model.matrix(~ 1,         data = colData(dds))
