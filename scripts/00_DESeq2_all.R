@@ -1,7 +1,7 @@
 # Load packages
 library(tidyverse)
 library(DESeq2)
-library(sva)
+?library(sva)
 library(rio)
 
 # Create output directories

@@ -1,7 +1,7 @@
 # RNA-seq Meta-Analysis of Pancreatic Adenocarcinoma (PAAD)
 ## Research Plan for High-Impact Clinical Oncology Publication
 
-**Target Journals**: Journal of Clinical Oncology (JCO), Lancet Oncology
+**Target Journals**: Journal of Clinical Oncology (JCO)
 **Date**: January 2026
 
 ---

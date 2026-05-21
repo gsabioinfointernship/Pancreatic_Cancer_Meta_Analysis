@@ -7,26 +7,25 @@ library(DESeq2)
 library(sva)
 library(rio)
 
-
 # 01. Load count data
-GSE130688 <- import("data/GSE202853_raw_counts.tsv")
-glimpse(GSE130688)
+counts_data <- import("data/raw_counts/GSE130688_raw_counts.tsv")
+glimpse(GSE130688_counts)
 
 # 02. Load metadata
-metadata <- import("data/GSE130688_metadata.csv")
-glimpse(metadata)
+col_data <- import("data/metadata/GSE130688_metadata.csv")
+glimpse(col_data)
 
 # 03. Create a matrix & add gene ids as row names
-count_data <- GSE130688 |> column_to_rownames("GeneID") |>
+counts_data <- counts_data |> column_to_rownames("GeneID") |>
   as.matrix()
 
 # 04. Match metadata with count data
-metadata <- metadata |> 
-  filter(sample %in% colnames(count_data)) |> 
-  arrange(match(sample, colnames(count_data)))
+col_data <- col_data |> 
+  filter(sample %in% colnames(counts_data)) |> 
+  arrange(match(sample, colnames(counts_data)))
 
 # 05. Prepare Sample information
-colData <- data.frame( condition = as.factor(metadata$condition), 
+colData <- data.frame(condition = as.factor(metadata$condition), 
                        row.names = colnames(count_data))
 
 # 06. Create DESeq2 data set object

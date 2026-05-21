@@ -139,5 +139,3 @@ if(file.exists("outputs/DrugTarget/druggable_genes.csv")) {
     }
   }
 }
-
-message("Drug target analysis completed!")
