@@ -1,0 +1,20 @@
+"ID","n_cancers","cancers","mean_qval"
+"IGLV5_37",3,"colorectal; esophagus; kidney",0.00095732421442976
+"HSD17B8",2,"colorectal; esophagus",4.14899393846478e-38
+"ZNF436",2,"colorectal; esophagus",0.0104184035470464
+"GREB1",2,"colorectal; kidney",0.0317447738594517
+"SIPA1",2,"colorectal; esophagus",0.0343531844613972
+"NR1H4",1,"kidney",1.10426156479445e-06
+"LHX3",1,"colorectal",0.000832254574843735
+"SIX1",1,"kidney",0.00106975048803126
+"PSMB5",1,"colorectal",0.00636942880271812
+"MED25",1,"colorectal",0.0119320724744119
+"ZSCAN2",1,"colorectal",0.0171208855358725
+"ATXN7L3",1,"colorectal",0.0182926933208551
+"ZNF512B",1,"esophagus",0.0302395063353283
+"ZNF596",1,"esophagus",0.0302395063353283
+"PHF21A",1,"esophagus",0.0370444637835315
+"POU2AF1",1,"colorectal",0.0478681190795566
+"TAFAZZIN",1,"colorectal",0.0478681190795566
+"ZBTB5",1,"colorectal",0.0478681190795566
+"DMRT1",1,"colorectal",0.0490314840440533

@@ -1,0 +1,2 @@
+category,subcategory,ID,Description,GeneRatio,BgRatio,RichFactor,FoldEnrichment,zScore,pvalue,p.adjust,qvalue,geneID,Count
+Environmental Information Processing,Signaling molecules and interaction,hsa04080,Neuroactive ligand-receptor interaction,11/75,208/7102,0.0528846153846154,5.00782051282051,6.06051740697083,9.8778283696281e-06,0.00115570591924649,0.00111255540584232,2925/2741/51738/887/5734/5540/100996758/79924/727/170589/7253,11

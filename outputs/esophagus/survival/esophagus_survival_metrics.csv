@@ -1,0 +1,2 @@
+"cancer","n_candidates","n_tested","n_events","n_prognostic","n_high_risk","n_protective","top_gene","top_HR","top_HR_lo","top_HR_hi","top_pvalue","top_padj"
+"esophagus",100,98,77,0,0,0,NA,NA,NA,NA,NA,NA

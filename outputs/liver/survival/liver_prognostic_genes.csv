@@ -1,0 +1,2 @@
+"Symbol","n","n_events","HR","HR_lo","HR_hi","pvalue","z","padj","pooled_log2FC","rem_padj","n_studies","Direction","Risk_aligned"
+"RTKN2",360,128,1.16553656387226,1.06082134553056,1.28058837376027,0.00142640236350792,3.18925450447357,0.037086461451206,-2.74166085717681,1.96181992593347e-07,2,"Down","Down-High risk"

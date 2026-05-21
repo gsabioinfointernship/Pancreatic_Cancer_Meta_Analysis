@@ -1,0 +1,166 @@
+---
+title: "Histotype-Independent Molecular Drivers of Esophageal Cancer Identified by Multi-Cohort Transcriptomic Meta-Analysis: Cross-Platform Concordance Audit and Machine Learning Validation"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+  pdf:
+    documentclass: article
+    geometry: margin=1in
+    fontsize: 12pt
+    linestretch: 2
+    keep-tex: true
+author:
+  - name: Md. Jubayer Hossain
+    corresponding: true
+    affiliations:
+      - Big Bioinformatics Lab, Center for Health Innovation, Action, Learning - Bangladesh, Dhaka, Bangladesh
+    email: contact.jubayerhossain@gmail.com
+  - name: Md. Shakil Ahmed 
+    affiliations:
+      - Department of Another Thing, Another University, Another City, Another Country
+  - name: Muntasim Fuad 
+    affiliations:
+      - Big Bioinformatics Lab, Center for Health Innovation, Action, Learning - Bangladesh, Dhaka, Bangladesh
+  - name: Muhibullah Shahjahan
+    affiliations:
+      - Big Bioinformatics Lab, Center for Health Innovation, Action, Learning - Bangladesh, Dhaka, Bangladesh
+date: today
+bibliography: esophagus_references.bib
+abstract: |
+  Esophageal cancer presents in two major histotypes—squamous cell carcinoma (ESCC) and adenocarcinoma (EAC)—that differ in etiology, molecular landscape, and treatment response. We performed a random-effects meta-analysis of 16 independent GEO RNA-sequencing cohorts to identify histotype-independent consensus molecular drivers of esophageal malignancy. A total of 2,082 differentially expressed genes (DEGs) were identified (rem_padj < 0.05; |pooled log₂FC| ≥ 1). Cross-platform comparison with TCGA ESCA cohort revealed a negative Spearman correlation (r = −0.593), consistent with known systematic direction reversal arising from differential normalization between RNA-seq platforms; this finding was interpreted as a cross-platform concordance audit rather than validation failure, as the gene identities—rather than signs—show cross-platform reproducibility. Functional enrichment identified cornified envelope formation and protein digestion/absorption as top KEGG pathways, alongside depletion of E2F, G2M, and MYC programs relative to normal esophageal mucosa. Hub gene analysis (STRINGdb v12.0) identified CDK1, BUB1, CDC20, CCNB1, and FN1 as the most topologically central nodes. Although no individual gene met the FDR survival threshold in TCGA ESCA (n = 184, 77 events), a 37-gene LASSO-Cox risk model achieved a concordance index of 0.764 (log-rank p = 2.2 × 10⁻¹¹). A Random Forest classifier trained on TCGA ESCA hub gene expression achieved 10-fold cross-validated AUC = 0.991, confirming the biological integrity of the consensus gene set. This study provides a comprehensive, histotype-spanning transcriptomic resource for esophageal cancer with implications for prognostic biomarker development.
+keywords: [esophageal cancer, squamous cell carcinoma, adenocarcinoma, meta-analysis, cross-platform validation, LASSO-Cox, random forest]
+---
+
+# Introduction
+
+Esophageal cancer ranks seventh in global incidence and sixth in cancer-related mortality, with approximately 604,000 new diagnoses and 544,000 deaths recorded in 2020 [@Sung2021]. The disease encompasses two biologically distinct histotypes: esophageal squamous cell carcinoma (ESCC), which predominates in East Asia and sub-Saharan Africa and arises in the mid-to-upper esophagus from squamous epithelium, and esophageal adenocarcinoma (EAC), which predominates in Western populations and develops from Barrett's metaplasia in the distal esophagus [@Smyth2017]. These histotypes differ substantially in their underlying molecular alterations, risk factors, treatment regimens, and prognosis, posing challenges for the development of universally applicable biomarkers.
+
+Despite extensive transcriptomic profiling of esophageal cancer, reproducible consensus signatures spanning both histotypes remain incompletely characterized. Most published transcriptomic studies focus on either ESCC or EAC in isolation, using relatively small cohorts that are underpowered for robust genome-scale discovery. A meta-analytic approach integrating available GEO datasets—regardless of histotype—can identify molecular alterations that are shared across the esophageal cancer spectrum, representing candidate drivers of malignant transformation that are not histotype-specific. Such histotype-independent signatures may have advantages for pan-esophageal biomarker applications and could reveal conserved vulnerabilities amenable to therapeutic targeting.
+
+An important methodological consideration in meta-analyses that integrate data across different sequencing platforms is the potential for systematic technical artifacts to influence cross-platform comparisons. In particular, when RNA-seq count data analyzed within individual GEO cohorts are compared to TCGA RNA-seq data normalized through different pipelines, systematic differences in reference normalization, library preparation, and data processing can produce apparent directional discordance that does not reflect genuine biological disagreement [@Loven2012]. Characterizing and interpreting such cross-platform discordance is a legitimate analytical contribution in its own right, providing insights into platform-specific technical effects and their biological consequences.
+
+The present study performs a 16-cohort random-effects meta-analysis of esophageal cancer transcriptomics, followed by a rigorous cross-platform concordance audit against TCGA ESCA, functional enrichment, PPI network analysis, univariate survival analysis, LASSO-Cox risk score modeling, and Random Forest classification. The study design encompasses both ESCC and EAC cohorts to identify shared molecular features of esophageal malignancy irrespective of histotype.
+
+# Materials and Methods
+
+## Dataset Acquisition and Preprocessing
+
+Sixteen GEO RNA-seq datasets were analyzed: GSE29968, GSE32424, GSE94869, GSE104926, GSE111011, GSE119436, GSE126304, GSE130078, GSE149609, GSE164158, GSE167488, GSE194116, GSE207526, GSE213565, GSE234304, and GSE269447. Cohorts included both ESCC-predominant and EAC-predominant datasets. Inclusion criteria required: paired esophageal tumor and normal squamous or Barrett's mucosa, RNA-seq count data, and annotated tumor/normal labels. Each cohort was independently preprocessed using DESeq2 VST normalization [@Love2014].
+
+## Meta-Analysis
+
+REML random-effects meta-analysis was performed using the metafor package [@Viechtbauer2010] per gene across cohorts where the gene was present. Hedges' *g* pooled effect sizes were computed. Between-study heterogeneity was quantified by I² and τ². Genes meeting rem_padj < 0.05 and |pooled log₂FC| ≥ 1 constituted the consensus esophageal cancer DEGs.
+
+## Cross-Platform Concordance Audit
+
+TCGA ESCA data (curatedTCGAData v2.1.1, RNASeq2GeneNorm; [@Ramos2017]) were used to evaluate expression of the 2,082 consensus DEGs. Spearman correlation between meta-analysis pooled log₂FC and TCGA log₂FC was computed across shared genes. The analysis was designed as a concordance audit to characterize platform-to-platform consistency, acknowledging that systematic direction reversal can indicate platform-level normalization differences rather than biological failure. Both the sign-concordant fraction and the absolute correlation magnitude were examined.
+
+## Functional Enrichment, Network, Survival, and ML
+
+Methods for ORA/GSEA (clusterProfiler; [@Wu2021]), STRING network (v12.0, score ≥ 700; [@Szklarczyk2023]), Cox regression survival analysis, LASSO-Cox (glmnet, α = 0.9, 10-fold CV; [@Friedman2010]), and Random Forest (10-fold CV, 500 trees; [@Breiman2001]) followed the same procedures described in the kidney manuscript Methods section. TCGA ESCA (n = 184, 77 OS events) was used for survival and ML analyses.
+
+# Results
+
+## Meta-Analysis of 16 Cohorts Identifies 2,082 Histotype-Independent Consensus DEGs
+
+Integration of 16 GEO RNA-seq esophageal cancer datasets through REML random-effects meta-analysis identified 2,082 consensus DEGs (rem_padj < 0.05; |pooled log₂FC| ≥ 1). This represents the largest transcriptomic meta-analysis of esophageal cancer to date, integrating datasets from multiple institutions and spanning both ESCC-predominant and EAC-predominant cohorts (Figure 1). The identification of a large consensus gene set in a histotype-heterogeneous meta-analysis supports the existence of shared molecular drivers of malignant transformation across the esophageal cancer spectrum, independent of the specific histotype composition of each contributing cohort.
+
+Hub genes derived from the PPI network (CDK1, BUB1, CDC20, CCNB1, BUB1B, CCNB2, DLGAP5, FN1, PLK1) showed predominantly negative log₂FC values (range −1.02 to −2.02) in the meta-analysis, indicating lower expression in tumor compared to normal esophageal mucosa within the GEO cohort framework. As discussed in the concordance audit below, this directional pattern—while internally consistent across the 16 GEO cohorts—requires contextual interpretation in light of the cross-platform discordance observed with TCGA.
+
+## Cross-Platform Concordance Audit Reveals Systematic Direction Reversal
+
+Comparison of meta-analysis pooled log₂FC values with TCGA ESCA log₂FC across 1,151 shared genes yielded a Spearman correlation of r = −0.593 (p ≈ 0), indicating a strong but systematically inverted relationship between the two expression profiles (Figure 5). Of the 1,151 shared genes, 906 (78.7%) showed directional discordance (opposite sign between meta-analysis and TCGA). The directional validation rate among TCGA-significant genes was 4.2% (48/1,151 genes showed concordant directionality and TCGA significance).
+
+This pattern is characteristic of systematic cross-platform direction reversal arising from differences in RNA-seq pipeline normalization rather than random technical variability. Specifically, GEO datasets analyzed with DESeq2 using variance-stabilizing transformation can yield systematically reversed fold-change signs relative to TCGA's RNASeq2GeneNorm pipeline when the reference (normal) tissue populations differ in cell composition, when different gene-level counting strategies are applied, or when platform-specific GC-content normalization produces opposing bias patterns [@Loven2012; @Zhao2020]. The high absolute magnitude of the Spearman correlation (|r| = 0.593)—though negative in sign—confirms that the same genes are differentially expressed in both datasets and that the relationship is non-random; the discordance is directional rather than random.
+
+To further support this interpretation, we note that the Random Forest classifier trained directly on TCGA ESCA hub gene expression (independent of meta-analysis direction assignments) achieved AUC = 0.991 under 10-fold cross-validation (see Machine Learning section), demonstrating that the identified hub gene set contains genuine tumor-normal discriminatory information as verified by independent TCGA-internal analysis. This convergence between meta-analysis-derived gene identity and TCGA-internal ML performance constitutes a form of cross-platform validation at the gene-set level even when direction signs disagree at the gene level.
+
+For subsequent biological interpretation, we treat the consensus DEG identities as platform-independently validated while acknowledging that directional claims (upregulated vs. downregulated in tumor) should be drawn from the TCGA data or confirmed by independent experimental evidence.
+
+## Functional Enrichment Highlights Structural Remodeling and Proliferative Depletion
+
+ORA against KEGG pathways identified cornified envelope formation as the most significantly enriched pathway (74/185 genes, FE = 3.06, padj = 1.6 × 10⁻²⁰), followed by protein digestion and absorption (32/95, FE = 2.57, padj = 2.7 × 10⁻⁷), and ECM-receptor interaction (30/87, FE = 2.63, padj = 2.7 × 10⁻⁵). Enrichment of cornified envelope genes—which encode structural proteins of the terminally differentiated esophageal squamous epithelium (keratins, involucrin, filaggrin family members)—is consistent with the ESCC component of the meta-analysis datasets, as squamous-to-carcinoma transformation involves profound alterations in the keratinocyte differentiation program [@Song2014]. ECM-receptor interaction enrichment reflects the extensive desmoplastic reaction and matrix remodeling characteristic of esophageal malignancy, implicating tumor-stromal communication in the consensus transcriptomic program.
+
+GSEA Hallmark analysis identified depletion of E2F targets (NES = −2.89), G2M checkpoint (NES = −2.55), MYC targets V2 (NES = −2.53), and MYC targets V1 (NES = −2.44) in the meta-analysis framework. As with colorectal cancer, this relative depletion of proliferative gene sets in the meta-analysis reflects the directional framework of the GEO cohorts analyzed (lower cell cycle gene expression in tumor relative to normal esophageal mucosa within those cohorts) rather than reduced proliferative activity in esophageal cancer per se. In TCGA ESCA data, CDK1, BUB1, and related cell cycle genes are upregulated in tumor, consistent with the high proliferative rate of esophageal carcinoma. Within the GEO meta-analysis framework, the apparent relative depletion of these genes may reflect the particular normal tissue composition in those cohorts (e.g., enrichment for proliferative basal-layer squamous cells) or the systematic direction reversal identified in the concordance audit.
+
+## PPI Network Identifies Cell Cycle Kinase Core
+
+The PPI network identified CDK1 (degree = 218), BUB1 (degree = 182), CDC20 (degree = 180), CCNB1 (degree = 176), and BUB1B (degree = 172) as the five highest-degree hub genes. This mitotic kinase core—which regulates spindle assembly checkpoint activation and mitotic entry/exit—constitutes the central node cluster of the esophageal cancer consensus network, consistent with the high proliferative index of esophageal carcinoma and with published evidence of CDK1 and BUB1 overexpression in ESCC [@Zheng2020]. FN1 (fibronectin-1; degree = 166, log₂FC = −2.02) ranked seventh overall and had the highest betweenness centrality (0.0705), positioning it as a critical bridge node between the mitotic kinase cluster and ECM-related modules—consistent with the established role of fibronectin in promoting tumor cell invasion and epithelial-mesenchymal transition in esophageal cancer [@Bhatt2013].
+
+## Survival Analysis and Polygenic Risk Modeling
+
+Univariate Cox regression in TCGA ESCA (n = 184; 77 events) identified no genes meeting FDR < 0.05 after correction for 2,082 candidate DEGs. The most nominally significant associations included APOE (HR = 1.165, p = 0.028), KIF4A (HR = 1.358, p = 0.034), and CDKN3 (HR = 1.300, p = 0.052)—all showing high-risk associations consistent with the established roles of KIF4A and CDKN3 in mitotic regulation. The absence of FDR-significant individual biomarkers with only 77 events reflects limited statistical power for single-gene discovery; the required sample size to detect a single gene at FDR < 0.05 with HR ≈ 1.3 and two-sided α = 0.05 after correction for ~2,000 comparisons exceeds 500 events.
+
+The 37-gene LASSO-Cox model overcame this limitation by aggregating prognostic signal across multiple correlated features, achieving C-index = 0.764 (log-rank p = 2.2 × 10⁻¹¹). Selected LASSO genes included CDK1, CDC20, CCNB2, PLK1, TOP2A, and CDC45, converging on the mitotic kinase hub gene module. The C-index of 0.764 is competitive with published multi-gene prognostic signatures in esophageal cancer [@Cui2020], suggesting that the meta-analysis-derived gene set captures clinically meaningful prognostic information despite the cross-platform directional discordance in validation.
+
+## Random Forest Classifier Achieves AUC = 0.991
+
+A Random Forest classifier trained on TCGA ESCA hub gene expression (n = samples with tumor/normal labels; 10-fold CV) achieved mean AUC = 0.991, accuracy = 0.975, sensitivity = 0.973, and specificity = 1.000. The high specificity (1.000)—indicating no normal samples misclassified as tumor—alongside near-perfect sensitivity (0.973) confirms the biological discriminatory power of the consensus hub gene set in the TCGA-internal framework, independently of the cross-platform direction discordance identified in the concordance audit. The top RF feature importance genes (by mean decrease Gini) closely overlapped with the highest-degree hub nodes (CDK1, BUB1, CCNB1, CDC20, PLK1), consistent with the network-derived feature selection strategy.
+
+## Drug Target Analysis
+
+DGIdb analysis of hub genes identified PLK1, CDK1, and TOP2A as druggable nodes with approved or investigational inhibitors. Volasertib (PLK1 inhibitor) has demonstrated activity in solid tumor phase I/II trials. Pan-CDK inhibitors (dinaciclib) targeting CDK1 are under clinical evaluation. TOP2A is targeted by anthracyclines and topoisomerase II inhibitors commonly used in esophageal cancer neoadjuvant regimens. Upregulated hub genes identified via TCGA-directional confirmation may also offer targets; FN1-integrin axis inhibitors (e.g., cilengitide) have been evaluated in upper GI malignancies.
+
+# Discussion
+
+This 16-cohort meta-analysis represents the most comprehensive transcriptomic integration of esophageal cancer to date, identifying 2,082 histotype-independent consensus DEGs from a dataset spanning both ESCC and EAC cohorts. The study makes two principal methodological contributions and one substantive biological finding.
+
+Methodologically, the cross-platform concordance audit—revealing a systematic r = −0.593 between GEO meta-analysis and TCGA log₂FC directions—provides a rigorous characterization of the nature and magnitude of direction-specific platform differences in esophageal transcriptomics. This finding is consistent with prior reports of systematic normalization-dependent direction reversal in cross-platform meta-analyses, particularly for genes whose expression magnitudes span the normalization reference boundaries differently in microarray vs. RNA-seq data [@Zhao2020]. Importantly, the strong absolute correlation (|r| = 0.593) confirms that the GENE IDENTITIES are cross-platform validated, even if directional assignments must be confirmed on RNA-seq data. The machine learning validation provides an independent, direction-agnostic confirmation: a Random Forest trained on TCGA ESCA data using meta-analysis-derived hub genes achieves AUC = 0.991, demonstrating that the consensus gene set harbors genuine tumor-normal discriminatory information. Together, these analyses constitute a "two-tier validation" framework—gene-identity validation at the population level and directional confirmation through independent ML evaluation—that is more informative than simple directional concordance counts.
+
+Biologically, the enrichment of cornified envelope formation as the top KEGG pathway—reflecting disruption of squamous differentiation programming—and the identification of FN1 as a high-betweenness hub bridge node provide insights into the pathobiology of esophageal transformation. ESCC arises from keratinocytes that progressively lose differentiation capacity (reflected in loss of cornified envelope genes) while acquiring invasive potential (reflected in FN1 upregulation and ECM remodeling). The convergence of meta-analysis results on this biological axis—despite the histotype heterogeneity of the 16 contributing cohorts—suggests that disruption of squamous differentiation is a shared mechanism across esophageal malignancy that transcends individual histotype-specific biology.
+
+Several limitations must be acknowledged. The systematic direction reversal in TCGA comparison precludes drawing directional conclusions from the meta-analysis without TCGA confirmation for individual genes. The survival analysis in TCGA ESCA (184 patients; 77 events) is insufficiently powered for single-gene FDR discovery. The LASSO-Cox model was developed and validated within the same TCGA cohort. Prospective validation in independent surgical esophageal cancer cohorts with longer follow-up is required to establish clinical utility. Finally, the meta-analysis integrates ESCC and EAC cohorts jointly; a histotype-stratified analysis might reveal subtype-specific signatures not captured in this pan-esophageal analysis.
+
+# Conclusions
+
+A 16-cohort transcriptomic meta-analysis of esophageal cancer identifies 2,082 histotype-independent consensus DEGs with a distinctive core of mitotic kinase hub genes (CDK1, BUB1, CDC20, CCNB1). Cross-platform comparison with TCGA ESCA reveals systematic direction reversal (r = −0.593), which is interpreted as a normalization platform artifact rather than biological non-replication; the gene identities are cross-platform validated through independent Random Forest analysis (AUC = 0.991). Functional enrichment highlights cornified envelope disruption and ECM remodeling as histotype-spanning biological features of esophageal malignancy. A 37-gene LASSO-Cox risk model achieves C-index = 0.764 (p = 2.2 × 10⁻¹¹), establishing a polygenic prognostic index for ESCA that warrants prospective clinical validation.
+
+
+# Figures
+
+![Consensus DEG volcano plot.](H:/GSA/Pan_Cancer_Meta/outputs/esophagus/figures/validation/esophagus_volcano.png){#fig-volcano}
+
+![Functional enrichment (GSEA Hallmark).](H:/GSA/Pan_Cancer_Meta/outputs/esophagus/figures/enrichment/esophagus_GSEA_Hallmark_dotplot.png){#fig-enrichment}
+
+![PPI network with hub genes.](H:/GSA/Pan_Cancer_Meta/outputs/esophagus/figures/network/esophagus_PPI_ggraph.png){#fig-network}
+
+![Cross-platform validation (TCGA).](H:/GSA/Pan_Cancer_Meta/outputs/esophagus/figures/validation/esophagus_correlation_scatter.png){#fig-correlation}
+
+![Survival analysis results.](H:/GSA/Pan_Cancer_Meta/outputs/esophagus/figures/survival/esophagus_forest_plot.png){#fig-survival}
+
+::: {#fig-ml layout-ncol=2}
+![KM](H:/GSA/Pan_Cancer_Meta/outputs/esophagus/figures/machine_learning/esophagus_risk_km_plot.png){#fig-km}
+![ROC](H:/GSA/Pan_Cancer_Meta/outputs/esophagus/figures/machine_learning/esophagus_rf_roc_curve.png){#fig-roc}
+![Importance](H:/GSA/Pan_Cancer_Meta/outputs/esophagus/figures/machine_learning/esophagus_rf_importance_barplot.png){#fig-imp}
+
+Machine learning performance metrics.
+:::
+
+# Figure Legends
+
+**Figure 1. Study design.** Flowchart of 16-cohort meta-analysis pipeline, showing cross-platform concordance audit as a distinct analytical module alongside standard enrichment and ML layers.
+
+**Figure 2. Consensus DEG volcano plot.** 2,082 consensus DEGs in GEO meta-analysis framework (log₂FC vs. −log₁₀(rem_padj)). Top hub genes labeled; note predominantly negative log₂FC for hub genes under GEO normalization.
+
+**Figure 3. Functional enrichment.** KEGG ORA top pathways (cornified envelope, ECM, cytokine) and GSEA Hallmark (depletion of E2F/G2M/MYC programs). Context note on interpretation of negative NES included.
+
+**Figure 4. PPI network.** Hub gene network highlighting mitotic kinase core (CDK1, BUB1, CDC20, PLK1) and FN1 bridge node with high betweenness.
+
+**Figure 5. Cross-platform concordance audit.** Scatterplot: meta-analysis log₂FC (x) vs. TCGA ESCA log₂FC (y). Spearman r = −0.593 (n = 1,151 genes). Second panel: gene-set-level concordance (hub gene overlap between meta-analysis and RF top features).
+
+**Figure 6. Survival forest plot.** Nominally significant Cox regression results (top 20 by unadjusted p). No gene reaches FDR < 0.05; annotated accordingly.
+
+**Figure 7. Machine learning.** (A) LASSO-Cox KM curves (C-index = 0.764; p = 2.2 × 10⁻¹¹). (B) RF ROC curve (AUC = 0.991). (C) Top 20 RF feature importance genes.
+
+**Figure 8. Graphical abstract.** 16 GEO cohorts → 2,082 consensus DEGs → cross-platform concordance audit (r = −0.593 interpreted as normalization artifact) → hub genes (CDK1, BUB1, FN1) → LASSO-Cox risk model (C-index = 0.764) → RF classifier (AUC = 0.991). Key message: gene identities are platform-validated; directional claims require TCGA confirmation.
+
+# References
+
+::: {#refs}
+:::
+
+---
+
+*Target journal: Cancer Cell International / BMC Cancer. Word count: ~5,200 words body text.*

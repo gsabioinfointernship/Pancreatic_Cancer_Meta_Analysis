@@ -1,0 +1,2 @@
+"cancer","n_candidates","n_tested","n_events","n_prognostic","n_high_risk","n_protective","top_gene","top_HR","top_HR_lo","top_HR_hi","top_pvalue","top_padj"
+"kidney",100,98,219,85,85,0,"UBE2C",1.559,1.441,1.688,4.101e-28,2.787e-26

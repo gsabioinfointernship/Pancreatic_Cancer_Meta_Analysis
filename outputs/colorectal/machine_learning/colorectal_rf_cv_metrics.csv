@@ -1,0 +1,8 @@
+"Metric","Value"
+"CV_AUC_mean","1"
+"CV_AUC_sd","0"
+"CV_Accuracy","0.9926"
+"CV_Sensitivity","1"
+"CV_Specificity","0.9"
+"n_folds","10"
+"note","k-fold cross-validation (replaces single 80/20 holdout)"

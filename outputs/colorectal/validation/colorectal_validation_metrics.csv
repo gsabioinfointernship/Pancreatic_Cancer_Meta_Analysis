@@ -1,0 +1,2 @@
+"cancer","n_meta_sig","n_TCGA_DEGs","n_compared","n_validated","concordance_pct","validation_pct","spearman_r","spearman_p"
+"colorectal",2170,8335,717,709,99.7,98.9,0.9293,0

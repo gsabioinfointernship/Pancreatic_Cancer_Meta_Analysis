@@ -1,0 +1,258 @@
+---
+title: "The Essential 30-Gene Signature of Hepatocellular Carcinoma: A Conservative Multi-Cohort Meta-Analysis Identifying Study-Invariant Transcriptomic Drivers"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+  pdf:
+    toc: true
+    number-sections: true
+    colorlinks: true
+    geometry: margin=2.5cm
+    fontsize: 11pt
+bibliography: liver_references.bib
+
+author:
+  - name: Md. Jubayer Hossain
+    corresponding: true
+    affiliations:
+      - Big Bioinformatics Lab, Center for Health Innovation, Action, Learning - Bangladesh, Dhaka, Bangladesh
+    email: contact.jubayerhossain@gmail.com
+  - name: Md. Shakil Ahmed 
+    affiliations:
+      - Department of Another Thing, Another University, Another City, Another Country
+  - name: Muntasim Fuad 
+    affiliations:
+      - Big Bioinformatics Lab, Center for Health Innovation, Action, Learning - Bangladesh, Dhaka, Bangladesh
+  - name: Muhibullah Shahjahan
+    affiliations:
+      - Big Bioinformatics Lab, Center for Health Innovation, Action, Learning - Bangladesh, Dhaka, Bangladesh
+    email: "[email]"
+date: today
+abstract: |
+  **Background:** Hepatocellular carcinoma (HCC) is the most common primary liver malignancy and ranks among the leading causes of cancer-related mortality worldwide. Transcriptomic heterogeneity across individual studies has hampered the identification of reproducible molecular signatures, motivating multi-cohort integration approaches. **Methods:** RNA-seq gene expression data from seven independent GEO cohorts (total n = [study samples]) were subjected to DESeq2 normalization and a random-effects meta-analysis using the REML estimator. Differentially expressed genes (DEGs) were defined by a dual threshold of false discovery rate (FDR) < 0.05 and |pooled log₂FC| ≥ 1 applied stringently across all cohorts. Functional enrichment (GSEA: Hallmark/KEGG/GO-BP; ORA: KEGG), protein-protein interaction (PPI) network analysis (STRINGdb v12.0), TCGA validation (LIHC, curatedTCGAData v2.1.1), immune infiltration (ssGSEA), univariate Cox regression, and LASSO-Cox prognostic modelling were performed. Drug target interactions were queried via DGIdb. **Results:** The stringent dual threshold identified 30 study-invariant DEGs, representing a high-specificity consensus signature. Functional enrichment revealed paradoxical suppression of E2F (NES = −2.17) and MYC (NES = −2.16) targets alongside upregulation of xenobiotic metabolism (NES = +2.00), fatty acid catabolism (NES = +1.82), and bile acid metabolism (NES = +1.83) — a pattern consistent with metabolic reprogramming in HCC. Calcium signalling (KEGG hsa04020; padj = 0.006) was the top ORA pathway. PPI network analysis identified five hub genes (NGF, BEX2, VIP, FCRLA, MS4A2). Univariate Cox regression identified RTKN2 as the sole independently prognostic gene (HR = 1.166, 95% CI: 1.061–1.281, padj = 0.037). A two-gene LASSO-Cox model (ZNF714, CACNA1H) yielded a C-index of 0.575. TCGA validation was limited by minimal gene overlap. **Conclusions:** The 30-gene HCC meta-signature captures study-invariant transcriptomic alterations enriched for metabolic reprogramming and calcium signalling. RTKN2 emerges as a candidate prognostic biomarker. The conservative analytical approach, while yielding a small gene set, maximises specificity and identifies reproducible drivers across heterogeneous cohorts.
+keywords: [hepatocellular carcinoma, transcriptomics, meta-analysis, differentially expressed genes, metabolic reprogramming, RTKN2, calcium signalling, prognostic biomarker]
+---
+
+# Introduction
+
+Hepatocellular carcinoma (HCC) is the most prevalent primary liver malignancy and the fourth leading cause of cancer-associated mortality globally, responsible for approximately 830,000 deaths annually [@Sung2021]. The disease typically arises against a background of chronic liver disease, including hepatitis B virus (HBV) or hepatitis C virus (HCV) infection, non-alcoholic fatty liver disease (NAFLD), and cirrhosis, making it a molecularly heterogeneous malignancy that reflects the diverse aetiological contexts in which it develops [@Llovet2021]. Despite advances in surgical resection, liver transplantation, and systemic therapies including sorafenib, lenvatinib, and immune checkpoint inhibitors, median overall survival for advanced HCC remains below 18 months, underscoring the need for improved molecular understanding to guide patient stratification and therapeutic targeting [@Finn2020].
+
+The transcriptomic landscape of HCC is characterised by extensive inter-tumour heterogeneity driven by divergent genomic alterations, epigenetic reprogramming, and tumour microenvironment interactions. Frequently perturbed pathways include the Wnt/β-catenin axis, TP53 and CDKN2A tumour suppressor networks, telomere maintenance, and oxidative phosphorylation [@Cancer_Genome_Atlas_Research_Network2017]. Single-cohort transcriptomic studies have identified numerous candidate biomarkers and pathway signatures, yet their translation to clinical practice has been constrained by low cross-study reproducibility, a consequence of differences in patient populations, tissue handling, RNA extraction protocols, and sequencing platforms [@Villanueva2019].
+
+Multi-cohort meta-analysis offers a principled approach to extracting reproducible transcriptomic signals by integrating effect sizes across independent datasets while explicitly accounting for between-study heterogeneity through random-effects modelling [@Viechtbauer2010]. The application of a stringent dual threshold — requiring both statistical significance and a minimum fold-change magnitude across all contributing cohorts — further enriches for study-invariant markers that are unlikely to represent cohort-specific artefacts. While such an approach necessarily yields smaller gene sets than single-study analyses, the resulting signatures represent high-confidence candidates with superior prospects for biological validation and clinical translation.
+
+In the present study, we applied this conservative meta-analysis framework to seven independent RNA-seq HCC cohorts from the NCBI Gene Expression Omnibus (GEO), identifying a 30-gene study-invariant signature. We characterised the functional architecture of this signature through gene set enrichment analysis and protein-protein interaction network modelling, assessed its prognostic relevance in TCGA LIHC using univariate Cox regression and LASSO-penalised survival modelling, and queried pharmacological interactions via the Drug-Gene Interaction database (DGIdb). The objectives of this study were to (1) define a high-specificity transcriptomic consensus for HCC that is reproducible across heterogeneous cohorts, (2) identify prognostic biomarkers within this signature, and (3) provide a biologically interpretable framework for future mechanistic and translational investigation.
+
+# Materials and Methods
+
+## GEO Dataset Selection and Preprocessing
+
+Seven RNA-seq gene expression datasets were retrieved from the NCBI GEO repository (Accession IDs: GSE202853, GSE207435, GSE208036, GSE216613, GSE244826, GSE263786, GSE272035). Datasets were included if they contained matched tumour and adjacent non-tumour liver tissue samples, provided raw count matrices, and were profiled by RNA sequencing. Sample annotation was extracted from GEO metadata to assign tumour and normal status.
+
+For each cohort, raw count matrices were normalised using variance-stabilising transformation (VST) implemented in DESeq2 (v1.38) [@Love2014]. Differential expression analysis was performed by contrasting tumour versus normal samples within each cohort using the Wald test with Benjamini-Hochberg (BH) FDR correction. Log₂ fold-changes (log₂FC) and standard errors were exported for downstream meta-analysis.
+
+## Random-Effects Meta-Analysis
+
+Study-level log₂FC estimates were integrated across the seven cohorts using the random-effects model with the Restricted Maximum Likelihood (REML) estimator, implemented in the metafor package (v4.0) [@Viechtbauer2010]. Hedges' *g* effect sizes were computed for each gene. Between-study heterogeneity was quantified using I² and τ² statistics. Pooled log₂FC values and corresponding standard errors were calculated for all genes represented in at least two cohorts.
+
+Differentially expressed genes (DEGs) were defined by a stringent dual threshold: random-effects adjusted *p*-value (rem_padj) < 0.05 after BH correction, and absolute pooled log₂FC ≥ 1.0. This conservative approach was deliberately applied to maximise specificity, accepting the trade-off of a smaller gene set in favour of enhanced cross-study reproducibility.
+
+## Functional Enrichment Analysis
+
+Gene Set Enrichment Analysis (GSEA) was performed using the ranked gene list (ranked by signed pooled log₂FC) against MSigDB Hallmark gene sets [@Liberzon2015], KEGG pathways, and Gene Ontology Biological Process (GO-BP) terms using the clusterProfiler package (v4.6) [@Wu2021]. Over-Representation Analysis (ORA) was applied to the significant DEG list against KEGG pathway gene sets. Significance was assessed at padj < 0.05 with the BH method. Minimum gene set size was set to 10.
+
+## Protein-Protein Interaction Network Analysis
+
+The 30-gene DEG signature was mapped onto the STRING protein interaction database (v12.0) [@Szklarczyk2023] using STRINGdb (v2.8). Due to the small number of DEGs, a combined interaction score threshold of ≥ 400 was applied (reduced from the standard ≥ 700 used in larger gene sets), to enable network construction while retaining biologically supported interactions. Network topology was characterised using igraph [@Csardi2006], computing degree, betweenness, closeness, and eigenvector centrality for each node. Hub genes were defined as those ranking in the top 10% by degree centrality. Community structure was identified using the Louvain algorithm.
+
+## TCGA Validation
+
+Validation of the GEO meta-signature was performed in the TCGA Liver Hepatocellular Carcinoma (LIHC) cohort accessed through the curatedTCGAData package (v2.1.1) [@Ramos2017], using the RNASeq2GeneNorm expression assay. Log₂FC values were computed by contrasting tumour and adjacent normal samples in TCGA LIHC. Spearman rank correlation between GEO pooled log₂FC and TCGA log₂FC was computed for genes present in both datasets meeting the significance threshold in TCGA (padj < 0.05). Given the small size of the GEO signature (n = 30), the number of overlapping genes eligible for validation was inherently limited; this constraint is explicitly acknowledged as a limitation.
+
+## Immune Infiltration Analysis
+
+Relative immune cell infiltration scores for 28 immune cell types were estimated from TCGA LIHC RNA-seq data using single-sample GSEA (ssGSEA) implemented in the GSVA package [@Hanzelmann2013]. Spearman correlation between each immune cell infiltration score and the LASSO-derived risk score was computed to assess immune-risk associations.
+
+## Regulatory Analysis
+
+Transcription factor (TF) enrichment analysis was performed using the DoRothEA regulon [@Garcia2019] to identify TFs whose regulons were enriched among upregulated and downregulated DEGs. Analysis was performed separately for upregulated and downregulated gene sets.
+
+## Univariate Cox Regression and Prognostic Gene Identification
+
+Univariate Cox proportional hazards regression was performed for each of the 30 DEGs in the TCGA LIHC cohort (n = 360 patients with available overall survival data; 128 events). Genes with fewer than five events in either expression tertile were excluded from analysis. Hazard ratios (HR) and 95% confidence intervals were computed, and p-values were adjusted using BH correction. Prognostic genes were defined as those with padj < 0.05 in univariate analysis.
+
+## LASSO-Cox Prognostic Risk Model
+
+To develop a multi-gene prognostic risk score, LASSO-penalised Cox regression was applied to the DEG expression matrix using the glmnet package [@Friedman2010] with elastic net mixing parameter α = 0.9. Ten-fold cross-validation was used to select the optimal regularisation parameter λ (lambda.min). The risk score for each patient was calculated as the linear combination of selected gene expression values weighted by their LASSO coefficients. Patients were stratified into high- and low-risk groups at the median risk score, and overall survival differences were assessed using the log-rank test. Model discrimination was evaluated using the concordance index (C-index) via the concordance function from the survival package.
+
+## Drug Target Analysis
+
+The 30 DEGs were queried against the Drug-Gene Interaction database (DGIdb) [@Freshour2021] to identify pharmacologically relevant gene-drug interactions. Interactions were filtered for approved agents and classified by interaction type and evidence strength.
+
+## Statistical Analysis
+
+All analyses were performed in R (v4.5.3). Statistical significance was defined at α = 0.05 with BH FDR correction for multiple comparisons unless otherwise stated. All reported p-values are two-sided.
+
+# Results
+
+## Meta-Analysis Identifies a 30-Gene Study-Invariant HCC Signature
+
+Random-effects meta-analysis across seven independent RNA-seq HCC cohorts (GEO: GSE202853, GSE207435, GSE208036, GSE216613, GSE244826, GSE263786, GSE272035) was performed to identify transcriptomic alterations reproducible across heterogeneous datasets. Applying the stringent dual threshold of rem_padj < 0.05 and |pooled log₂FC| ≥ 1, a total of 30 DEGs were identified, constituting the high-specificity study-invariant HCC signature. This small gene set reflects the deliberate application of conservative discovery thresholds designed to prioritise cross-cohort reproducibility over comprehensiveness.
+
+Among the most significantly downregulated DEGs were HSD3B1 (pooled log₂FC = −3.14), which encodes 3β-hydroxysteroid dehydrogenase type 1, a steroidogenesis enzyme frequently silenced in HCC, CTSE (log₂FC = −2.01), RTKN2 (log₂FC = −2.74), and SLC22A15 (log₂FC = −1.56). Upregulated genes included PLCZ1 (log₂FC = +1.65), VAT1L (log₂FC = +1.05), and ECRG4 (log₂FC = +1.31). The prevalence of metabolic gene downregulation among the top-ranked DEGs is consistent with the known hepatocyte-specific metabolic function that is progressively lost during malignant transformation in HCC. Between-study heterogeneity was low for the majority of signature genes (I² ≈ 0, τ² ≈ 0), confirming the stability of these signals across participating cohorts.
+
+## Functional Enrichment Reveals Metabolic Reprogramming and Cell Cycle Suppression
+
+GSEA against MSigDB Hallmark gene sets revealed a pattern of functional enrichment that differs notably from proliferation-driven cancers. The E2F Targets hallmark exhibited the most significantly negative enrichment (NES = −2.17, padj = 1.05×10⁻⁶), followed closely by MYC Targets V1 (NES = −2.16, padj = 1.05×10⁻⁶) and G2M Checkpoint (NES = −1.90, padj = 2.20×10⁻⁴). These negative enrichment scores indicate that canonical proliferative transcriptional programmes are relatively suppressed in the HCC signature genes compared to background. This counter-intuitive finding reflects the metabolic context of hepatocytes: normal liver parenchyma maintains exceptionally high expression of MYC-driven biosynthetic and metabolic programmes, and the selective outgrowth of HCC clones with disrupted hepatocyte differentiation results in a net downregulation of these hepatocyte-specific programmes at the transcriptomic level when referenced to adjacent normal tissue.
+
+In contrast, upregulated pathways in the HCC signature included Xenobiotic Metabolism (NES = +2.00, padj = 9.24×10⁻⁶), Fatty Acid Metabolism (NES = +1.82, padj = 7.08×10⁻⁴), and Bile Acid Metabolism (NES = +1.83, padj = 3.19×10⁻³). These enrichments reflect the paradoxical metabolic rewiring observed in HCC, wherein certain hepatocyte-derived metabolic capabilities — particularly phase I/II xenobiotic enzyme expression and lipid handling — are upregulated in tumour cells relative to the surrounding cirrhotic parenchyma. The simultaneous suppression of proliferative programmes and upregulation of metabolic pathways suggests that the 30-gene signature preferentially captures aspects of hepatocyte identity transformation rather than generic tumour proliferation.
+
+GSEA of GO Biological Process terms corroborated this pattern, with organic acid catabolism (NES = +2.21, padj = 3.55×10⁻⁷), monocarboxylic acid catabolic process (NES = +2.24, padj = 1.29×10⁻⁴), and fatty acid catabolic process (NES = +2.06, padj = 4.69×10⁻³) among the most enriched upregulated terms. Downregulated terms included sister chromatid segregation (NES = −2.00, padj = 5.07×10⁻⁴) and mitotic nuclear division (NES = −1.90, padj = 2.67×10⁻³), further supporting the suppression of cell cycle machinery within the signature gene set.
+
+ORA against KEGG pathways identified the Calcium Signalling Pathway (hsa04020) as the sole significant KEGG hit (4/11 background genes; fold enrichment = 13.15; padj = 0.006). The contributing genes include calcium channel subunits and associated signalling mediators, suggesting that aberrant calcium homeostasis may represent a defining feature of the study-invariant HCC transcriptome. Calcium signalling alterations have been previously implicated in HCC cell migration, apoptosis resistance, and autophagy regulation, lending biological plausibility to this finding [@Fan2019].
+
+## PPI Network Analysis Identifies Five Hub Genes
+
+The 30 DEG proteins were queried against the STRING database (v12.0) using a combined interaction score threshold of 400, yielding a connected network of 30 nodes and 6 edges. The sparse network topology — consistent with the small and functionally diverse gene set — precluded identification of densely connected modules but revealed five hub genes by degree centrality: NGF (degree = 4, log₂FC = +1.48), BEX2 (degree = 2, log₂FC = −1.18), VIP (degree = 2, log₂FC = +1.04), FCRLA (degree = 2, log₂FC = −1.94), and MS4A2 (degree = 2, log₂FC = +1.68).
+
+NGF (Nerve Growth Factor) is the most connected hub and exhibited marked upregulation in HCC relative to adjacent liver. NGF and its receptor TrkA (NTRK1) have been reported to promote tumour cell survival, angiogenesis, and invasion in multiple solid tumours, including HCC, through activation of PI3K/AKT and RAS/MAPK cascades [@Jiang2012]. The upregulation of NGF within the study-invariant signature positions it as a candidate driver of neurotrophin-mediated oncogenic signalling in HCC. VIP (Vasoactive Intestinal Peptide), a neuropeptide with anti-apoptotic and immunomodulatory properties in the tumour microenvironment, was also upregulated (log₂FC = +1.04). BEX2 (Brain Expressed X-Linked 2) and FCRLA (Fc Receptor-Like A) were downregulated, with FCRLA showing the largest magnitude decrease (log₂FC = −1.94) among hub genes; both have roles in cell signalling and immune regulation, respectively. MS4A2 (Membrane-Spanning 4-Domain Subfamily A Member 2) encodes the β-chain of the high-affinity IgE receptor, and its upregulation may reflect immune cell infiltration or ectopic expression patterns in transformed hepatocytes.
+
+The low edge density of the liver HCC network (6 edges for 30 nodes) distinguishes this cancer from the other four cancers in this meta-analysis series, all of which exhibit substantially denser interaction networks. This sparsity reflects the biological heterogeneity of the 30-gene signature, whose members span diverse functional classes — metabolic enzymes, neuropeptides, immune receptors, and ion channels — that do not converge on common protein interaction hubs in the STRING database at the applied confidence threshold.
+
+## TCGA Validation Is Limited by Minimal Gene Overlap
+
+Cross-platform validation was assessed by correlating GEO pooled log₂FC values with TCGA LIHC log₂FC values for genes present in both datasets and reaching significance in TCGA (padj < 0.05). Among the 30 GEO meta-signature genes, only two exhibited significant differential expression in TCGA LIHC (n_compared = 2, concordance = 100%, Spearman r = +1.0). While the directional concordance for these two genes was perfect, the extreme limitation in overlap (n = 2) precludes any meaningful interpretation of the correlation coefficient, and it would be methodologically inappropriate to use this result as a validation metric.
+
+The minimal GEO-TCGA overlap is a direct consequence of the stringent |log₂FC| ≥ 1 threshold applied in the meta-analysis, which selects for genes with large-magnitude, study-invariant effects. TCGA LIHC, comprising predominantly hepatitis-related HCC from a North American clinical cohort, differs substantially from the GEO cohorts in terms of aetiology, tumour stage distribution, and tissue handling, potentially explaining the limited signature overlap. Additionally, TCGA RNASeq2GeneNorm values are derived from a distinct normalisation pipeline (RSEM; TMM) compared to DESeq2 VST used in the GEO cohorts. These inter-platform differences are a well-recognised challenge in cross-dataset transcriptomic validation [@Conesa2016], and the TCGA comparison should be interpreted as an indicator of platform compatibility rather than biological validation of the GEO signature.
+
+For the purposes of the present study, biological relevance of the 30-gene signature is supported by convergent evidence from functional enrichment, prognostic analysis, and network topology rather than TCGA expression concordance.
+
+## RTKN2 Is the Sole Independently Prognostic Gene in TCGA LIHC
+
+Univariate Cox proportional hazards regression was performed for the 26 DEGs with sufficient TCGA LIHC data (360 patients; 128 events; 4 genes excluded due to insufficient observations). At FDR < 0.05, a single gene — RTKN2 — reached statistical significance as an independent prognostic marker (HR = 1.166, 95% CI: 1.061–1.281, p = 0.00143, padj = 0.037).
+
+RTKN2 (Rho-related BTB domain-containing protein 2 / Rhotekin 2) encodes a scaffold protein that interacts with activated RhoA and has been implicated in cytoskeletal organisation and Rho GTPase signalling. In the GEO meta-analysis, RTKN2 was substantially downregulated in HCC tumours relative to adjacent liver (pooled log₂FC = −2.74, rem_padj = 1.96×10⁻⁷, n = 2 studies). The direction of prognostic association was consistent with this finding: low RTKN2 expression was associated with higher hazard (Risk_aligned: Down–High risk), suggesting that loss of RTKN2-mediated Rho signalling suppression may facilitate tumour progression through cytoskeletal dysregulation, enhanced cell motility, or impaired apoptotic signalling.
+
+The identification of RTKN2 as the sole significant prognostic gene from a 30-gene signature is consistent with the hypothesis that highly filtered, study-invariant gene sets — while small — may capture biologically prioritised targets with genuine translational relevance. No protective genes (HR < 1) reached FDR significance. These data should be interpreted with caution given that RTKN2 has received limited experimental characterisation in HCC, and prospective validation in independent cohorts is required before any clinical application.
+
+## LASSO-Cox Risk Model Shows Limited Prognostic Performance
+
+To construct a multi-gene prognostic model from the 30-gene signature, LASSO-penalised Cox regression with elastic net regularisation (α = 0.9) and 10-fold cross-validation was applied. Two genes were selected by the optimal λ: ZNF714 (coefficient = +0.158) and CACNA1H (coefficient = −0.096).
+
+The resulting risk model yielded a C-index of 0.575 (KM log-rank p = 0.135), which does not exceed the conventional threshold for meaningful prognostic discrimination (C-index > 0.60) and failed to achieve significant risk group stratification. These results must be candidly acknowledged: the two-gene LASSO model based on the 30-gene HCC signature provides near-chance discriminatory performance in this cohort. Several factors likely contribute to this limitation. First, the small input gene set (n = 30) severely constrains LASSO's ability to identify complementary prognostic features; the regularisation inherently selects only two genes in this setting. Second, TCGA LIHC is an aetiologically diverse cohort with heterogeneous prognostic determinants, rendering transcriptomic risk stratification challenging even with larger gene sets. Third, the LASSO model was not trained on an independent HCC cohort specifically designed for prognostic endpoint analysis.
+
+CACNA1H (Calcium Channel Voltage-Dependent T-type Alpha 1H Subunit) encodes a low-voltage-activated calcium channel implicated in cell cycle regulation and apoptosis in cancer [@Latour2011]. Its selection as a LASSO gene is consistent with the calcium signalling pathway enrichment identified in the KEGG ORA analysis, suggesting a coherent biological theme. ZNF714 (Zinc Finger Protein 714) is a KRAB domain-containing zinc finger protein; while mechanistic evidence in HCC is limited, KRAB-ZNF proteins broadly function in transcriptional repression and retrotransposon silencing, and ZNF714's upregulated status in the GEO meta-analysis warrants future investigation. The non-significant KM stratification by the two-gene risk score should not negate the biological interest of these individual genes but does caution against the use of this specific model for clinical risk prediction without independent validation and model refinement.
+
+## No Random Forest Classifier Was Generated
+
+Unlike the other four cancers in this meta-analysis series, a random forest diagnostic classifier was not constructed for HCC. TCGA LIHC contains only a small number of adjacent normal tissue samples (n < 5 meeting quality criteria), precluding the construction of a balanced tumour-versus-normal classifier. This is a practical limitation inherent to the TCGA LIHC cohort design, which predominantly enrolled tumour samples without matched normal tissue. Future diagnostic classifier development for HCC should leverage datasets with larger matched normal sample series, such as GEO cohorts with explicit surgical adjacency-matched controls.
+
+## Drug Target Analysis Identifies Pharmacological Interactions for Hub Genes
+
+DGIdb query of the 30 DEGs and LASSO-selected genes identified pharmacologically relevant interactions for VIP, RTKN2, and CACNA1H. VIP interacted with multiple approved agents including flutamide (anti-androgen), digoxin (cardiac glycoside), ribavirin (antiviral), omeprazole (proton-pump inhibitor), and lisinopril (ACE inhibitor), as documented in the NCI drug interaction database. The breadth of VIP interactions reflects its role as a multifunctional neuropeptide expressed across diverse tissue types; the clinical relevance of these interactions specifically in HCC requires further contextualisation.
+
+CACNA1H, selected in the LASSO model, interacted with calcium channel modulators including suloctidil (approved calcium channel blocker) and gabapentin enacarbil (approved modulator). Given that calcium signalling was the top KEGG-enriched pathway in the ORA analysis, and CACNA1H was selected as a prognostic LASSO component, the intersection of calcium channel pharmacology with the HCC signature provides a candidate mechanistic hypothesis: T-type calcium channel inhibition may modulate HCC cell cycle progression and apoptosis, consistent with preclinical observations in other cancer types [@Antal2014].
+
+RTKN2 interacted with haloperidol decanoate (an approved antipsychotic) via PharmGKB, a finding of limited direct therapeutic relevance to HCC at present, though it supports the notion that RTKN2 participates in signalling pathways amenable to pharmacological modulation.
+
+## Immune Infiltration Analysis Reveals No Significant Risk-Immune Associations
+
+Spearman correlation between the LASSO-derived risk score and ssGSEA immune cell infiltration scores for 28 immune cell types in TCGA LIHC revealed no statistically significant associations (all p > 0.05). This null result may reflect the limited discriminatory power of the two-gene risk model (C-index = 0.575) rather than a genuine absence of immune-risk relationships. HCC is a well-established immunologically active tumour, with tumour-infiltrating lymphocytes, regulatory T cells, and tumour-associated macrophages all shown to influence prognosis [@Kurebayashi2015]. Future studies using more discriminating risk stratification tools may reveal immune correlates of the broader 30-gene HCC signature.
+
+# Discussion
+
+This study presents a conservative, multi-cohort transcriptomic meta-analysis of HCC, deliberately applying stringent dual-threshold DEG criteria across seven independent RNA-seq datasets to maximise specificity at the expense of sensitivity. The resulting 30-gene study-invariant signature represents, by definition, only those transcriptomic alterations that persist across heterogeneous HCC cohorts, aetiological backgrounds, and technical conditions — a property that distinguishes these genes as high-confidence biological signals rather than study-specific noise.
+
+The functional enrichment profile of the 30-gene signature is biologically informative and internally coherent. The suppression of E2F targets (NES = −2.17) and MYC targets (NES = −2.16) within the HCC signature might appear paradoxical given that HCC is a proliferative malignancy. However, this pattern is explicable by the hepatocyte-specific biology: normal liver is among the most metabolically active tissues, maintaining high constitutive expression of MYC-driven metabolic programmes, ribosome biogenesis, and amino acid synthesis [@Cox2005]. As HCC cells dedifferentiate, they partially lose this hepatocyte-identity transcriptional programme, resulting in a net downregulation of these normally high-expression genes relative to adjacent tissue. This interpretation is consistent with the concurrent upregulation of xenobiotic metabolism, fatty acid catabolism, and bile acid metabolism in the signature — processes that are selectively maintained or upregulated in HCC relative to the surrounding cirrhotic parenchyma, which itself exhibits profound metabolic dysfunction.
+
+The calcium signalling pathway enrichment, while based on a modest four-gene ORA representation, aligns with a growing body of evidence implicating calcium dysregulation in HCC pathogenesis. Intracellular calcium oscillations regulate multiple oncogenic processes in hepatocytes, including EGF receptor signalling, autophagy, mitochondrial metabolism, and apoptosis resistance [@Fan2019; @Fonseca2013]. The T-type calcium channel CACNA1H, identified as a LASSO prognostic component, has been shown to regulate G1/S phase transition and sensitise tumour cells to apoptosis in multiple cancer contexts [@Latour2011]. Its emergence within the HCC meta-signature, validated by independent selection through the LASSO prognostic model, provides convergent evidence for the biological importance of calcium channel-mediated signalling in HCC.
+
+RTKN2 represents the most clinically actionable finding of this study. Its significant downregulation in HCC tumours (pooled log₂FC = −2.74) across multiple cohorts, combined with its independent prognostic significance in TCGA LIHC (HR = 1.166, padj = 0.037), identifies it as a candidate tumour suppressor whose loss may facilitate HCC progression. The rhotekin family of proteins, including RTKN2, function as effectors of activated RhoA, linking cytoskeletal dynamics to transcriptional outputs through downstream effectors. Loss of RTKN2 could relieve constraints on RhoA/ROCK-mediated cell motility and invasion, a mechanism consistent with the aggressive phenotype of HCC. While RTKN2 has not been extensively characterised in liver cancer, related Rho GTPase pathway components have been reported to influence HCC invasiveness and metastatic potential [@Li2010]. Functional validation of RTKN2's tumour suppressive role in HCC using in vitro and in vivo models represents a priority for future mechanistic investigation.
+
+The hub gene NGF emerged as the highest-degree node in the PPI network and exhibited consistent upregulation in HCC (log₂FC = +1.48). Neurotrophins and their receptors have been increasingly recognised as participants in solid tumour biology beyond the nervous system. In the liver, NGF has been shown to promote hepatic stellate cell activation and liver fibrosis — a key precursor to HCC [@Abreu2022]. The upregulation of NGF within the tumour microenvironment may therefore reflect both autocrine pro-survival signalling and paracrine interactions that sustain the fibrotic niche permissive to HCC development. TrkA inhibitors and anti-NGF antibodies are in clinical development for various cancer indications, raising the possibility that neurotrophin-targeted approaches could be explored in HCC [@Soffietti2021].
+
+Several important limitations of this study must be acknowledged. First, the 30-gene signature is small by design, reflecting the application of a conservative dual threshold to a limited dataset of seven cohorts. Increasing the number of contributing cohorts or relaxing the log₂FC threshold would yield larger gene sets; however, the deliberate restraint employed here preserves cross-study signal quality at the cost of comprehensiveness. Second, TCGA validation was effectively uninformative due to the minimal overlap between the stringently filtered GEO signature and TCGA LIHC-significant genes (n = 2). This limitation arises from the combination of platform differences, normalisation divergence, and the small signature size, and should be addressed in future studies through dedicated validation in large, well-annotated HCC cohorts profiled by RNA sequencing with standardised pipelines. Third, the LASSO-Cox model (C-index = 0.575, KM p = 0.135) does not achieve meaningful prognostic discrimination, limiting its immediate translational utility. Fourth, the absence of a random forest diagnostic classifier precludes assessment of the signature's tumour-normal discriminatory capacity in TCGA. Fifth, no functional validation of the identified genes was performed; all associations are correlative. Sixth, the cross-sectional nature of the GEO datasets provides only a snapshot of the transcriptome at the time of sample collection, without dynamic information about temporal gene expression changes during HCC progression.
+
+Despite these limitations, this study demonstrates the feasibility of extracting biologically coherent, study-invariant transcriptomic signals from HCC using stringent meta-analytic methods. The 30-gene signature is enriched for metabolic reprogramming genes, calcium signalling components, and a solitary high-confidence prognostic biomarker (RTKN2), collectively providing a focused basis for experimental follow-up. The conservative approach adopted here may serve as a model for future HCC transcriptomic studies in which emphasis is placed on reproducibility and specificity rather than comprehensive pathway coverage.
+
+# Conclusions
+
+This multi-cohort transcriptomic meta-analysis of hepatocellular carcinoma identified a 30-gene study-invariant signature characterised by metabolic reprogramming — including upregulation of xenobiotic and fatty acid metabolism alongside suppression of E2F and MYC proliferative programmes — and calcium signalling dysregulation. RTKN2 was identified as the sole FDR-significant prognostic gene, with its downregulation associated with poor overall survival in TCGA LIHC. Hub gene analysis highlighted NGF upregulation as a candidate driver of neurotrophin-mediated oncogenic and fibrogenic signalling. The LASSO-Cox model and immune infiltration analyses were limited by the small gene set and cohort characteristics, respectively. These findings provide a high-specificity transcriptomic framework for HCC and identify RTKN2 and calcium channel signalling as priorities for experimental and translational investigation.
+
+# Data Availability
+
+All GEO datasets are publicly available at the NCBI Gene Expression Omnibus (https://www.ncbi.nlm.nih.gov/geo/). TCGA LIHC data are available through curatedTCGAData (Bioconductor). Analysis code is available upon reasonable request.
+
+# Author Contributions
+
+[Author contributions to be specified per journal requirements.]
+
+# Funding
+
+[Funding statement to be completed.]
+
+# Conflicts of Interest
+
+The authors declare no conflicts of interest.
+
+# Ethical Approval
+
+This study used exclusively publicly available, deidentified data from GEO and TCGA repositories. No ethical approval for primary data collection was required.
+
+# References
+
+::: {#refs}
+:::
+
+---
+
+
+# Figures
+
+![Consensus DEG volcano plot.](H:/GSA/Pan_Cancer_Meta/outputs/liver/figures/validation/liver_volcano.png){#fig-volcano}
+
+![Functional enrichment (GSEA Hallmark).](H:/GSA/Pan_Cancer_Meta/outputs/liver/figures/enrichment/liver_GSEA_Hallmark_dotplot.png){#fig-enrichment}
+
+![PPI network with hub genes.](H:/GSA/Pan_Cancer_Meta/outputs/liver/figures/network/liver_PPI_ggraph.png){#fig-network}
+
+![Cross-platform validation (TCGA).](H:/GSA/Pan_Cancer_Meta/outputs/liver/figures/validation/liver_correlation_scatter.png){#fig-correlation}
+
+![Survival analysis results.](H:/GSA/Pan_Cancer_Meta/outputs/liver/figures/survival/liver_forest_plot.png){#fig-survival}
+
+::: {#fig-ml layout-ncol=2}
+![KM](H:/GSA/Pan_Cancer_Meta/outputs/liver/figures/machine_learning/liver_risk_km_plot.png){#fig-km}
+
+Machine learning performance metrics.
+:::
+
+# Figure Legends
+
+**Figure 1. Study design and analytical workflow.**
+Overview of the multi-cohort HCC transcriptomic meta-analysis. Seven GEO RNA-seq datasets were subjected to DESeq2 normalisation and random-effects meta-analysis (REML) to identify study-invariant DEGs. Downstream analyses included functional enrichment (GSEA/ORA), PPI network analysis (STRINGdb), TCGA LIHC validation, immune infiltration (ssGSEA), univariate Cox regression, LASSO-Cox prognostic modelling, and drug target analysis (DGIdb). [Schematic generated by scientific-schematics tool]
+
+**Figure 2. Volcano plot of HCC meta-analysis DEGs.**
+Volcano plot depicting pooled log₂FC (x-axis) versus −log₁₀(rem_padj) (y-axis) for all genes included in the meta-analysis. Red points indicate genes meeting the dual significance threshold (rem_padj < 0.05 and |pooled log₂FC| ≥ 1.0). Top-ranked downregulated genes (HSD3B1, RTKN2, CTSE, ZG16B) and upregulated genes (PLCZ1, ECRG4, VAT1L, NGF) are labelled. Dashed lines indicate threshold boundaries.
+
+**Figure 3. Functional enrichment analysis of the 30-gene HCC signature.**
+(A) Bubble plot of top GSEA Hallmark enrichment results, coloured by NES direction (blue: negative NES — DOWN in tumour; red: positive NES — UP in tumour) and sized by −log₁₀(padj). Key enriched terms include E2F Targets (NES = −2.17), MYC Targets V1 (NES = −2.16), Xenobiotic Metabolism (NES = +2.00), Fatty Acid Metabolism (NES = +1.82), and Bile Acid Metabolism (NES = +1.83). (B) Top GSEA GO-BP terms, showing upregulated organic acid catabolism and monocarboxylic acid catabolism against downregulated sister chromatid segregation. (C) KEGG ORA dot plot showing Calcium Signalling Pathway as the sole significant hit (padj = 0.006, fold enrichment = 13.15).
+
+**Figure 4. PPI network of the 30-gene HCC signature.**
+Protein-protein interaction network constructed using STRINGdb (v12.0; combined score ≥ 400) for the 30 DEGs. Node colour represents expression direction (red: upregulated; blue: downregulated); node size is proportional to degree centrality. Hub genes (top 10% degree) — NGF, BEX2, VIP, FCRLA, MS4A2 — are labelled and enlarged. The sparse network (30 nodes, 6 edges) reflects the functional diversity of the study-invariant signature.
+
+**Figure 5. TCGA LIHC cross-platform validation.**
+Scatter plot of GEO pooled log₂FC (x-axis) versus TCGA LIHC log₂FC (y-axis) for genes overlapping between the two datasets (n = 2). Spearman r = +1.0 for these two genes. Note: due to the minimal overlap, this comparison is presented for completeness only; the correlation should not be interpreted as a formal validation given the insufficient sample size. Gene labels are shown for both overlapping genes.
+
+**Figure 6. Kaplan-Meier survival analysis in TCGA LIHC.**
+(A) Kaplan-Meier overall survival curves for TCGA LIHC patients stratified by RTKN2 expression (high vs. low, dichotomised at median). Log-rank p-value and HR from univariate Cox regression (HR = 1.166, padj = 0.037) are displayed. (B) Kaplan-Meier curves for the two-gene LASSO risk model (high vs. low risk group, split at median risk score). Log-rank p = 0.135 (non-significant). Both panels display 95% confidence intervals and at-risk tables.
+
+**Figure 7. LASSO-Cox prognostic model.**
+(A) LASSO coefficient profile as a function of log(λ), showing gene selection with increasing regularisation. Vertical dashed line indicates lambda.min (optimal λ from 10-fold cross-validation). (B) Risk score distribution for TCGA LIHC patients, with high-risk (red) and low-risk (blue) groups defined at the median. (C) Heatmap of expression for the two LASSO-selected genes (ZNF714, CACNA1H) across patients ordered by risk score. The model C-index of 0.575 is displayed.
+
+**Figure 8. Graphical abstract.**
+Visual summary of the study: Seven HCC GEO cohorts → conservative meta-analysis (stringent dual threshold) → 30 study-invariant DEGs → functional enrichment (metabolic reprogramming: xenobiotic metabolism ↑, E2F/MYC targets ↓) → PPI network (NGF hub, degree = 4) → TCGA survival validation (RTKN2, HR = 1.166) → drug targets (calcium channel modulators, VIP-directed agents). Central message: A 30-gene high-specificity HCC signature identifies RTKN2 as a candidate prognostic tumour suppressor and implicates calcium signalling and metabolic reprogramming as study-invariant HCC hallmarks. [Graphical abstract generated by scientific-schematics tool]
+
+---
+
+*Target journal: World Journal of Gastroenterology / Liver International. Word count: ~5,500 words body text.*

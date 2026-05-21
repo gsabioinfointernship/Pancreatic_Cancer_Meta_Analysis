@@ -1,0 +1,2 @@
+"cancer","lasso_genes","lasso_cindex","lasso_km_p","rf_auc","rf_accuracy","rf_sensitivity","rf_specificity"
+"pancreatic",11,0.666,9.35e-05,NA,NA,NA,NA

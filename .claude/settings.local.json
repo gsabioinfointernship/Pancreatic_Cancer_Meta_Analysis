@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:github.com)",
+      "Bash(Rscript:*)",
+      "Bash(\"/c/Program Files/R/R-4.5.3/bin/Rscript.exe\":*)",
+      "Skill(scientific-writing)"
+    ]
+  }
+}

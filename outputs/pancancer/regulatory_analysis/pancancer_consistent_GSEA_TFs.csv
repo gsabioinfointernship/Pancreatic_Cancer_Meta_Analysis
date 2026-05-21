@@ -1,0 +1,47 @@
+"ID","n_cancers","cancers","mean_NES"
+"EPC1",4,"colorectal; esophagus; kidney; pancancer_all",-0.64019925490775
+"PSMB5",4,"colorectal; kidney; pancancer_all; pancreatic",0.582260369932007
+"NPAT",3,"colorectal; esophagus; pancancer_all",-1.60582836815369
+"FOXR2",3,"colorectal; kidney; pancancer_all",-0.125359201576625
+"NR1I2",3,"colorectal; kidney; pancancer_all",0.08968644668297
+"ZNF236",3,"colorectal; kidney; pancancer_all",0.077855315669895
+"CIC",3,"colorectal; kidney; pancancer_all",0.06798533353489
+"RFX7",3,"colorectal; kidney; pancancer_all",0.0642223041577249
+"NPM1",3,"colorectal; kidney; pancancer_all",-0.053891755108935
+"MYBL1",3,"colorectal; kidney; pancancer_all",-0.0442773217230951
+"NR1H4",3,"colorectal; kidney; pancancer_all",-0.039240237560625
+"HSF2",3,"colorectal; pancancer_all; pancreatic",-0.0268095714729201
+"CREB3L2",3,"colorectal; kidney; pancancer_all",-0.0192546142083599
+"ZZZ3",3,"colorectal; kidney; pancancer_all",-0.011065261064495
+"MCRS1",2,"colorectal; pancancer_all",-1.87564308582809
+"CASP8AP2",2,"colorectal; pancancer_all",-1.85751540724532
+"LMNB2",2,"colorectal; pancancer_all",-1.81668566460911
+"RUVBL1",2,"colorectal; pancancer_all",-1.78012686616497
+"SOX11",2,"kidney; pancancer_all",1.70029764544623
+"TBX1",2,"kidney; pancancer_all",1.68963607943274
+"ZNF548",2,"kidney; pancancer_all",1.67129859689533
+"ZNF532",2,"colorectal; pancancer_all",-1.6470724990807
+"MED25",2,"colorectal; pancancer_all",-1.60478286819578
+"PPARGC1A",2,"colorectal; pancancer_all",-1.59351873565385
+"OVOL3",2,"esophagus; pancancer_all",-1.51898395160648
+"FOXO4",2,"colorectal; pancancer_all",-1.51317694984977
+"ZNF581",2,"colorectal; pancancer_all",-1.50841788032147
+"ELF5",2,"colorectal; pancancer_all",-1.49563930729856
+"HMGB2",2,"kidney; pancancer_all",1.48931777501683
+"ZBED4",2,"colorectal; pancancer_all",-1.4856111362657
+"TASOR",2,"colorectal; pancancer_all",-1.48224094544075
+"CREB3",2,"kidney; pancancer_all",1.48199735216244
+"NCOA2",2,"kidney; pancancer_all",1.46428500403392
+"ZNF101",2,"kidney; pancancer_all",1.42818994231279
+"DLX6",2,"colorectal; pancancer_all",-1.40587760231051
+"IGLV5_37",2,"colorectal; pancancer_all",1.40047542003057
+"TAFAZZIN",2,"colorectal; pancancer_all",-1.39334327694772
+"HOXA10",2,"colorectal; pancancer_all",-1.39187968240358
+"LMTK3",2,"esophagus; pancancer_all",-1.38467460199738
+"ATF5",2,"colorectal; pancancer_all",-1.36756012155489
+"SRPK1",2,"colorectal; pancancer_all",-1.35958744152058
+"ALKBH3",2,"colorectal; pancancer_all",-1.35780274644697
+"ZBTB5",2,"colorectal; pancancer_all",-1.35668307264687
+"GTF2A2",2,"colorectal; pancancer_all",-1.33331018771163
+"ZNF784",2,"colorectal; pancancer_all",-1.32177314707136
+"DMRT1",2,"colorectal; pancancer_all",-1.32015722544605

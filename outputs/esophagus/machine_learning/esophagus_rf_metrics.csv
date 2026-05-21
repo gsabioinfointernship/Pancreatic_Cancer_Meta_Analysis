@@ -1,0 +1,20 @@
+"Metric","Value"
+"Accuracy",0.975
+"Kappa",0.84375
+"AccuracyLower",0.868414141517234
+"AccuracyUpper",0.999367255067951
+"AccuracyNull",0.925
+"AccuracyPValue",0.187658066743365
+"McnemarPValue",1
+"Sensitivity",0.972972972972973
+"Specificity",1
+"Pos Pred Value",1
+"Neg Pred Value",0.75
+"Precision",1
+"Recall",0.972972972972973
+"F1",0.986301369863014
+"Prevalence",0.925
+"Detection Rate",0.9
+"Detection Prevalence",0.9
+"Balanced Accuracy",0.986486486486487
+"AUC",0.990990990990991

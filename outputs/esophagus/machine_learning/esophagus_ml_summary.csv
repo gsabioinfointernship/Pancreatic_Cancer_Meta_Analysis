@@ -1,0 +1,2 @@
+"cancer","lasso_genes","lasso_cindex","lasso_km_p","rf_auc","rf_accuracy","rf_sensitivity","rf_specificity"
+"esophagus",37,0.764,2.24e-11,0.991,0.975,0.973,1

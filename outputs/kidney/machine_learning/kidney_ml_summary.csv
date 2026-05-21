@@ -1,0 +1,2 @@
+"cancer","lasso_genes","lasso_cindex","lasso_km_p","rf_auc","rf_accuracy","rf_sensitivity","rf_specificity"
+"kidney",53,0.795,0,0.995,0.973,1,0.762

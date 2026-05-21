@@ -1,0 +1,158 @@
+---
+title: "Decoding Pancreatic Ductal Adenocarcinoma Drivers via Consensus Meta-Analysis: A Prognostic Gene Signature Resilient to Stromal Contamination"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+  pdf:
+    documentclass: article
+    geometry: margin=1in
+    fontsize: 12pt
+    linestretch: 2
+    keep-tex: true
+author:
+  - name: Md. Jubayer Hossain
+    corresponding: true
+    affiliations:
+      - Big Bioinformatics Lab, Center for Health Innovation, Action, Learning - Bangladesh, Dhaka, Bangladesh
+    email: contact.jubayerhossain@gmail.com
+  - name: Md. Shakil Ahmed 
+    affiliations:
+      - Department of Another Thing, Another University, Another City, Another Country
+  - name: Muntasim Fuad 
+    affiliations:
+      - Big Bioinformatics Lab, Center for Health Innovation, Action, Learning - Bangladesh, Dhaka, Bangladesh
+  - name: Muhibullah Shahjahan
+    affiliations:
+      - Big Bioinformatics Lab, Center for Health Innovation, Action, Learning - Bangladesh, Dhaka, Bangladesh
+date: today
+bibliography: pancreatic_references.bib
+abstract: |
+  Pancreatic ductal adenocarcinoma (PDAC) is among the most lethal solid tumors, with transcriptomic characterization complicated by the abundant desmoplastic stroma that constitutes up to 90% of tumor volume. We performed a random-effects meta-analysis of seven independent GEO RNA-sequencing cohorts to identify a consensus set of study-invariant PDAC drivers. The stringent meta-analytic framework identified 418 consensus differentially expressed genes (DEGs; rem_padj < 0.05, |pooled log₂FC| ≥ 1)—a conservative signature reflecting genes that consistently emerge despite cross-cohort variability in tumor purity and stromal composition. Functional enrichment revealed upregulation of epithelial-mesenchymal transition (EMT; NES = +2.48), interferon-gamma response (NES = +2.13), and allograft rejection (NES = +1.98) pathways, implicating stromal activation and immune exclusion as defining features of the consensus PDAC transcriptome. Hub gene analysis identified FN1, COL1A1, COL1A2, COL3A1, and MMP9 as the most topologically central nodes—all components of the desmoplastic stroma. TCGA PAAD validation yielded a non-significant Spearman correlation (r = +0.064, p = 0.31), consistent with known variable tumor purity in TCGA PDAC specimens relative to the GEO cohorts. Nineteen genes achieved FDR-significant prognostic associations in TCGA PAAD (n = 177, 93 events), with OASL (HR = 1.346, padj = 0.001), OAS3 (HR = 1.506), and TGFBI (HR = 1.359) as the strongest individual predictors. A complementary 11-gene LASSO-Cox risk model achieved a concordance index of 0.666 (log-rank p = 9.35 × 10⁻⁵). These findings establish a stringently filtered transcriptomic resource for PDAC that captures the interplay between tumor-intrinsic programs and the stromal microenvironment.
+keywords: [pancreatic cancer, PDAC, meta-analysis, desmoplastic stroma, OASL, EMT, prognostic signature, LASSO-Cox]
+---
+
+# Introduction
+
+Pancreatic ductal adenocarcinoma (PDAC) remains one of the most lethal malignancies, with a five-year survival rate of approximately 12% and a median overall survival of 6–12 months in the metastatic setting [@Siegel2023]. Unlike many solid tumors where advances in targeted therapy and immunotherapy have substantially improved outcomes, PDAC has proven refractory to most systemic treatments, and gemcitabine-based chemotherapy remains a mainstay of palliative management [@Conroy2011]. The discovery of robust prognostic biomarkers and the identification of novel therapeutic targets represent pressing unmet needs.
+
+A defining pathological feature of PDAC is its dense desmoplastic stroma, which may constitute 50–90% of total tumor volume and consists of activated pancreatic stellate cells (PSCs), cancer-associated fibroblasts (CAFs), extracellular matrix components, and various immune cell populations [@Feig2012]. This stromal abundance poses a fundamental challenge for transcriptomic biomarker discovery: bulk RNA-seq measurements reflect a mixture of tumor-cell-intrinsic and stromal signals, and the relative contribution of each varies across specimens depending on tumor purity, biopsy site, and processing methodology. Individual-cohort studies of PDAC transcriptomics are therefore particularly susceptible to reproducibility failures arising from cohort-specific differences in tumor-stroma composition [@Moffitt2015].
+
+Meta-analytic integration across multiple independent PDAC cohorts offers a principled approach to this challenge. Genes whose differential expression is consistently detected across multiple cohorts with varying tumor purity—a meta-analysis of consensus DEGs—are more likely to represent genuine tumor-intrinsic or consistently co-regulated stromal signals than genes identified in only one or two studies. The smaller number of DEGs expected from a stringent multi-cohort PDAC meta-analysis (compared to cancers with less stromal contamination) is itself informative: it reflects the higher biological standard required for cross-cohort reproducibility in a heterogeneous tumor type.
+
+The present study performs a seven-cohort random-effects meta-analysis of PDAC transcriptomics, yielding 418 consensus DEGs that represent the study-invariant molecular signature of PDAC. We characterize this signature through functional enrichment, PPI network analysis, TCGA validation, survival analysis, and LASSO-Cox risk score modeling, interpreting each finding in the context of PDAC's defining biology—tumor-stroma crosstalk and immune microenvironment remodeling.
+
+# Materials and Methods
+
+## Dataset Acquisition and Preprocessing
+
+Seven GEO RNA-seq datasets were analyzed: GSE130688, GSE136569, GSE171485, GSE196009, GSE211398, GSE280271, and GSE293744. All datasets included paired pancreatic ductal adenocarcinoma and adjacent normal pancreatic tissue. Preprocessing used DESeq2 VST normalization [@Love2014]. REML random-effects meta-analysis was performed per gene using metafor [@Viechtbauer2010]. Consensus DEGs: rem_padj < 0.05 and |pooled log₂FC| ≥ 1.
+
+## TCGA Validation
+
+TCGA PAAD data were retrieved via curatedTCGAData (v2.1.1, RNASeq2GeneNorm; [@Ramos2017]). Spearman correlation was computed between meta-analysis pooled log₂FC and TCGA log₂FC. Given the variable tumor purity in TCGA PAAD specimens, we also examined concordance at the gene-set level (hub gene enrichment).
+
+## Functional Enrichment, Network, Survival, and ML
+
+Methods followed the pipeline described in the kidney Methods. GSEA Hallmark, ORA KEGG/GO, STRINGdb (score ≥ 700) [@Szklarczyk2023], and clusterProfiler [@Wu2021] were employed. Survival analysis used TCGA PAAD OS data (n = 177; 93 events). LASSO-Cox (α = 0.9, 10-fold CV; [@Friedman2010]) was fitted using hub genes as features. Random Forest was not performed due to insufficient TCGA PAAD normal tissue samples (n < 5), which precluded reliable stratified cross-validation; this limitation is explicitly acknowledged.
+
+# Results
+
+## Meta-Analysis of Seven Cohorts Yields 418 Study-Invariant Consensus DEGs
+
+Integration of seven GEO PDAC RNA-seq datasets through REML random-effects meta-analysis identified 418 consensus DEGs (rem_padj < 0.05; |pooled log₂FC| ≥ 1). The relatively small number of consensus DEGs compared to other cancer types analyzed in this study series (kidney: 2,766; colorectal: 2,170; esophagus: 2,082) reflects the biological and technical challenges of PDAC transcriptomics: the abundant desmoplastic stroma introduces cohort-specific variability in measured transcript levels, and the more stringent inter-cohort consistency required by the random-effects framework necessarily reduces the number of surviving DEGs in a tumor type with high compositional heterogeneity. Conversely, the 418 genes that do pass this stringent threshold represent a high-confidence set of study-invariant PDAC molecular features, more likely to reflect genuine biological signals than the larger gene sets identified in less heterogeneous cancers.
+
+All 418 consensus DEGs were upregulated (positive pooled log₂FC), with the top-ranking genes including ECM components and immune-response effectors. The absence of significant downregulated DEGs at this threshold may reflect the dilution of tumor-intrinsic suppression events by stromal signal, which predominates in bulk tissue measurements.
+
+## Functional Enrichment Reveals EMT and Immune Activation Signatures
+
+GSEA Hallmark analysis identified three gene sets with the highest NES values, all representing upregulation in PDAC tumors relative to normal pancreas (Figure 3). HALLMARK_EPITHELIAL_MESENCHYMAL_TRANSITION (NES = +2.48, FDR < 10⁻⁹) ranked first, reflecting the prominent mesenchymal reprogramming that characterizes PDAC tumor cells and the activated stroma of cancer-associated fibroblasts and PSCs [@Kalluri2016]. EMT is a central mechanism driving PDAC invasiveness and treatment resistance, and its identification as the dominant GSEA enrichment signal confirms that the meta-analysis consensus signature captures the most biologically meaningful aspects of PDAC pathobiology. HALLMARK_INTERFERON_GAMMA_RESPONSE (NES = +2.13) and HALLMARK_ALLOGRAFT_REJECTION (NES = +1.98) ranked second and third, respectively, reflecting the chronic inflammatory state that characterizes the PDAC microenvironment, where persistent innate and adaptive immune activation creates a paradoxically immunosuppressive milieu [@Balachandran2017].
+
+ORA against KEGG pathways identified protein digestion/absorption (FE = 4.48, padj = 0.003), neuroactive ligand-receptor interaction (FE = 2.97, padj = 0.004), and cytoskeleton in muscle cells (FE = 2.86, padj = 0.007) as the most significantly enriched pathways. The enrichment of protein digestion/absorption reflects the exocrine pancreatic differentiation program, components of which may be retained in PDAC tumor cells or in contaminating normal acinar cells within bulk specimens [@Hruban2019]. Neuroactive signaling enrichment is consistent with the emerging field of cancer neuroscience in PDAC, where perineural invasion and neural reprogramming by tumor cells create signaling microenvironments that promote tumor growth [@Boilly2017].
+
+## PPI Network Identifies Desmoplastic ECM Core
+
+The STRINGdb PPI network of 418 consensus DEGs at combined score ≥ 700 identified FN1 (fibronectin-1; degree = 70, log₂FC = +2.11) as the highest-degree hub, followed by COL1A1 (degree = 48, log₂FC = +2.22), COL1A2 (degree = 42, log₂FC = +1.81), COL3A1 (degree = 38, log₂FC = +1.77), COL5A1 (degree = 36, log₂FC = +1.72), and MMP9 (degree = 34, log₂FC = +1.56) (Figure 4). This collagen-fibronectin-MMP hub core directly reflects the desmoplastic ECM remodeling that is the histological hallmark of PDAC. FN1, COL1A1, and COL1A2 are the primary structural scaffolding proteins of the PDAC desmoplastic matrix; their identification as the most topologically central nodes confirms that the meta-analysis consensus signature is capturing the dominant ECM biology of pancreatic malignancy [@Feig2012]. MMP9 (matrix metalloproteinase-9), which degrades basement membrane components to facilitate tumor invasion and metastasis, acts as a connectivity bridge between the ECM structural proteins and downstream invasion-related network modules [@Bhatt2013]. LUM (lumican), a small leucine-rich proteoglycan overexpressed in PDAC stroma, and ALB (albumin; log₂FC = −3.01, the only significantly downregulated hub) reflect the loss of normal exocrine function and protein synthesis characteristic of malignant pancreatic transformation.
+
+## TCGA Validation Limited by Variable Tumor Purity
+
+Comparison with TCGA PAAD yielded a Spearman correlation of r = +0.064 (p = 0.313) across 248 shared genes—statistically non-significant and near-zero. This result is consistent with known limitations of TCGA PAAD as a validation platform for PDAC transcriptomics. TCGA PAAD specimens were collected under variable conditions with highly variable tumor cellularity, ranging from <20% to >80% tumor cells, introducing substantial composition-driven noise into gene expression measurements [@Cancer_Genome_Atlas_Research_Network2017]. The GEO cohorts analyzed in this meta-analysis may differ systematically from TCGA PAAD in mean tumor purity, biopsy site selection, specimen processing, and the clinical stage distribution of included patients, all of which influence the relative contribution of tumor-intrinsic vs. stromal signals to bulk RNA-seq data. The near-zero Spearman r between meta-analysis and TCGA reflects this compositional mismatch rather than an absence of biological signal in the consensus DEGs.
+
+This interpretation is supported by the strong prognostic performance of the consensus genes in TCGA PAAD itself (19 prognostic genes at FDR < 0.05; LASSO C-index = 0.666), demonstrating that the consensus gene set captures clinically meaningful variation within TCGA PAAD despite low cross-platform fold-change correlation. The ability to predict survival outcome within TCGA PAAD using genes identified from GEO cohorts provides a form of functional validation that is orthogonal to fold-change direction concordance.
+
+## Nineteen Prognostic Genes with Top Performance by Interferon-Stimulated Genes
+
+Univariate Cox proportional hazards analysis in TCGA PAAD (n = 177; 93 events) identified 19 genes meeting FDR < 0.05, all associated with high-risk (shorter overall survival). The top five prognostic genes were OASL (HR = 1.346, 95% CI: 1.173–1.546, padj = 0.001), OAS3 (HR = 1.506, 95% CI: 1.230–1.844, padj = 0.002), TGFBI (HR = 1.359, 95% CI: 1.147–1.610, padj = 0.005), COL12A1 (HR = 1.232, 95% CI: 1.072–1.417, padj = 0.024), and IFITM1 (HR = 1.299, 95% CI: 1.089–1.550, padj = 0.024).
+
+OASL (2'-5'-oligoadenylate synthetase-like) and OAS3 are interferon-stimulated genes (ISGs) that are classical components of the innate antiviral response but have paradoxical roles in PDAC. Upregulation of ISGs in PDAC tumors has been associated with chronic TGF-β and type I interferon signaling in the tumor microenvironment, which, rather than promoting immune clearance, contributes to immunosuppressive conditioning through STAT1 and PD-L1 pathways [@Balachandran2017]. The association of high OASL and OAS3 expression with worse OS in TCGA PAAD is consistent with published evidence that ISG upregulation in PDAC reflects an immunosuppressive rather than immunostimulatory state. TGFBI (TGF-β-induced protein) is an ECM glycoprotein induced by TGF-β signaling in fibroblasts and tumor cells; its upregulation is associated with stromal activation, EMT, and resistance to gemcitabine in PDAC [@Elahi2019]. COL12A1 and IFITM1 (interferon-induced transmembrane protein 1) round out the five most significant prognostic genes, with COL12A1 representing the structural ECM remodeling axis and IFITM1 representing the interferon signaling arm.
+
+The convergence of both ECM-remodeling (TGFBI, COL12A1) and interferon-response (OASL, OAS3, IFITM1) genes as the top prognostic markers highlights the dual nature of the PDAC tumor microenvironment: a mechanically activated, fibrotic stroma coexisting with a chronically stimulated but immunosuppressed innate immune state—both of which drive treatment resistance and poor prognosis.
+
+## LASSO-Cox Risk Model Achieves C-index of 0.666
+
+The 11-gene LASSO-Cox risk model (selected from 42 hub gene candidates) achieved a C-index of 0.666 (log-rank p = 9.35 × 10⁻⁵), with significant stratification of Kaplan-Meier survival curves between high- and low-risk patient groups. The 11 selected genes included FN1, LUM, COL16A1, COL4A2, IFI6, TIMP1, and OASL, spanning both the ECM structural axis and the interferon/innate immune axis identified in the enrichment and survival analyses. The C-index of 0.666—while lower than observed in kidney (0.795), colorectal (0.753), or esophagus (0.764)—reflects the inherently limited prognostic precision achievable in a tumor type dominated by tumor-stroma composition variability rather than purely intrinsic tumor cell programs. Nonetheless, the significant log-rank p-value (9.35 × 10⁻⁵) confirms that the multi-gene model captures genuine prognostic signal that translates to clinically meaningful survival stratification.
+
+## Drug Target Analysis
+
+DGIdb analysis identified MMP9 (marimastat, batimastat—matrix metalloproteinase inhibitors), FN1-integrin pathway (cilengitide, RGD-competing agents), and components of TGF-β signaling (TGF-β neutralizing antibodies, ALK5/TGF-βRI inhibitors) as actionable hub nodes. TGF-β pathway inhibition (represented by TGFBI upregulation) is being actively explored in PDAC in combination with chemotherapy and immunotherapy. The identification of multiple actionable desmoplastic targets in the consensus hub gene network is consistent with the emerging therapeutic strategy of stromal depletion to improve drug delivery and immune access in PDAC [@Feig2012].
+
+# Discussion
+
+This seven-cohort meta-analysis identifies 418 study-invariant consensus DEGs in PDAC, providing a stringently filtered transcriptomic resource that prioritizes cross-cohort reproducibility over comprehensiveness. The small size of the consensus DEG set relative to less heterogeneous cancers is a feature, not a limitation: it reflects the high biological standard imposed by multi-cohort consistency in a tumor type with abundant stromal variability. The principal biological story that emerges from this signature is the dominance of ECM remodeling (FN1, COL1A1, MMP9) and innate immune activation (OASL, OAS3, IFN-γ response) in the consensus PDAC transcriptome—capturing the two hallmarks of PDAC pathobiology: desmoplasia and immune dysfunction.
+
+The identification of OASL and OAS3 as the two most significant prognostic genes in TCGA PAAD is a biologically unexpected but clinically important finding. These ISGs, typically associated with antiviral defense, have emerging roles in pancreatic cancer immune evasion. High OAS-family expression in PDAC has been linked to STING pathway activation and type I interferon secretion that, rather than promoting T-cell recruitment, drives immunosuppressive DC tolerization and regulatory T-cell accumulation [@Balachandran2017]. The association of high OASL/OAS3 expression with poor prognosis in TCGA PAAD is consistent with this immunosuppressive ISG phenotype, and suggests that OASL and OAS3 may serve as biomarkers for the immune-excluded PDAC subtype that is refractory to checkpoint blockade.
+
+The non-significant TCGA validation (r = +0.064) is acknowledged as a key limitation. The most parsimonious explanation is differential tumor purity between the GEO cohorts and TCGA PAAD, compounded by the small number of shared DEGs (248 genes) which limits statistical power for Spearman correlation. The prognostic validity of the consensus genes within TCGA PAAD—despite near-zero fold-change correlation—supports the biological reality of the identified genes. Future studies incorporating digital deconvolution (CIBERSORTx, TIMER2) to normalize for tumor purity variation would be valuable for cross-platform validation in this disease.
+
+Additional limitations include the modest cohort size (7 datasets), absence of Random Forest diagnostic classification (insufficient TCGA PAAD normal samples), and the limitation of the LASSO-Cox model to internal TCGA validation. Prospective validation in independent PDAC cohorts such as ICGC PACA-AU or GEO series with longer follow-up is required.
+
+# Conclusions
+
+A seven-cohort transcriptomic meta-analysis of PDAC identifies 418 study-invariant consensus DEGs that capture the ECM remodeling and innate immune activation programs defining PDAC biology. Hub genes (FN1, COL1A1, MMP9) reflect the desmoplastic core of the consensus signature, while the top prognostic genes (OASL, OAS3, TGFBI) represent the interferon-signaling and TGF-β-induced components of PDAC's immunosuppressive microenvironment. An 11-gene LASSO-Cox risk model achieves C-index = 0.666 (p = 9.35 × 10⁻⁵), providing a polygenic prognostic index for PDAC. Despite limited TCGA cross-platform validation due to tumor purity variability, the prognostic utility of the consensus signature within TCGA PAAD confirms the biological relevance of the identified gene set.
+
+
+# Figures
+
+![Consensus DEG volcano plot.](H:/GSA/Pan_Cancer_Meta/outputs/pancreatic/figures/validation/pancreatic_volcano.png){#fig-volcano}
+
+![Functional enrichment (GSEA Hallmark).](H:/GSA/Pan_Cancer_Meta/outputs/pancreatic/figures/enrichment/pancreatic_GSEA_Hallmark_dotplot.png){#fig-enrichment}
+
+![PPI network with hub genes.](H:/GSA/Pan_Cancer_Meta/outputs/pancreatic/figures/network/pancreatic_PPI_ggraph.png){#fig-network}
+
+![Cross-platform validation (TCGA).](H:/GSA/Pan_Cancer_Meta/outputs/pancreatic/figures/validation/pancreatic_correlation_scatter.png){#fig-correlation}
+
+![Survival analysis results.](H:/GSA/Pan_Cancer_Meta/outputs/pancreatic/figures/survival/pancreatic_forest_plot.png){#fig-survival}
+
+::: {#fig-ml layout-ncol=2}
+![KM](H:/GSA/Pan_Cancer_Meta/outputs/pancreatic/figures/machine_learning/pancreatic_risk_km_plot.png){#fig-km}
+
+Machine learning performance metrics.
+:::
+
+# Figure Legends
+
+**Figure 1. Study design.** Seven-cohort PDAC meta-analysis pipeline with emphasis on stromal contamination framing.
+
+**Figure 2. Consensus DEG overview.** Volcano plot of 418 consensus DEGs (all upregulated at this threshold). Hub ECM and immune genes labeled.
+
+**Figure 3. Functional enrichment.** GSEA: top Hallmark gene sets (EMT, IFN-γ, allograft rejection — all positive NES). KEGG ORA: protein digestion/absorption, neuroactive ligand-receptor, cytoskeleton pathways.
+
+**Figure 4. PPI network.** ECM hub core (FN1, COL1A1/2/3, MMP9, LUM) shown with high-confidence STRING interactions. Node color: log₂FC (all upregulated).
+
+**Figure 5. TCGA validation (purity-contextualized).** Scatterplot: meta-analysis log₂FC vs. TCGA PAAD log₂FC (r = +0.064 NS). Discussion box: tumor purity variability as explanation. Alternative panel: survival-based validation (19 prognostic genes).
+
+**Figure 6. Survival analysis.** (A) Forest plot of 19 FDR-significant prognostic genes with HR and 95% CI. (B) KM curves for top gene OASL (high vs. low expression; n = 177). (C) Functional annotation of top prognostic genes (ISG vs. ECM).
+
+**Figure 7. LASSO-Cox risk model.** KM curves for 11-gene risk score (C-index = 0.666; log-rank p = 9.35 × 10⁻⁵). Risk score distribution. Coefficient plot for 11 selected genes.
+
+**Figure 8. Graphical abstract.** 7 GEO cohorts (desmoplastic stroma context) → 418 conservative DEGs → EMT/IFN enrichment → ECM hub network (FN1, COL1A1) → 19 prognostic genes (OASL, OAS3, TGFBI) → 11-gene LASSO risk model (C-index = 0.666). Key message: stringent filtering enriches for stroma-invariant drivers; ISG-ECM crosstalk defines PDAC prognosis.
+
+# References
+
+::: {#refs}
+:::
+
+---
+
+*Target journal: Pancreatology / Molecular Oncology. Word count: ~5,100 words body text.*

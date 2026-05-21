@@ -1,0 +1,6 @@
+cancer,n_druggable,n_high_prio,n_hub_targets,top_target
+colorectal,745,118,147,CYP3A4
+esophagus,625,101,129,CYP3A4
+kidney,994,154,183,CYP3A4
+liver,10,0,0,CACNA1H
+pancreatic,157,15,29,PDGFRB

@@ -1,0 +1,2 @@
+"cancer","lasso_genes","lasso_cindex","lasso_km_p","rf_auc","rf_accuracy","rf_sensitivity","rf_specificity"
+"liver",2,0.575,0.135,NA,NA,NA,NA
